@@ -832,7 +832,7 @@ function Assistant() {
             </div>
             <div className="side-stat">
               <span>API endpoint</span>
-              <b>localhost:9095</b>
+              <b>{api.backendHost}</b>
             </div>
           </section>
           <section className="side-info">

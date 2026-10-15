@@ -25,11 +25,21 @@ export interface ChatResponse {
     confidence?: number;
 }
 
-const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+export const DEFAULT_NGROK_BACKEND = 'https://preposterous-luetta-nonspecifically.ngrok-free.dev'
+const apiBase = (import.meta.env.VITE_API_BASE_URL || DEFAULT_NGROK_BACKEND).replace(/\/$/, '')
 const assistantBase = (import.meta.env.VITE_ASSISTANT_BASE_URL || apiBase).replace(/\/$/, '')
+
+export const backendHost = (() => {
+    try {
+        return new URL(apiBase).host
+    } catch {
+        return 'ngrok-free.dev'
+    }
+})()
 
 async function request<T = any>(base: string, path: string, init: RequestInit = {}): Promise<T> {
     const headers = new Headers(init.headers)
+    headers.set('ngrok-skip-browser-warning', '1')
     const key = import.meta.env.VITE_API_KEY
     if (key && base === apiBase) headers.set('X-API-Key', key)
     if (init.body && !(init.body instanceof FormData) && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
@@ -37,7 +47,7 @@ async function request<T = any>(base: string, path: string, init: RequestInit = 
     try {
         response = await fetch(`${base}${path}`, {...init, headers})
     } catch {
-        throw new Error(`Cannot reach ${base}. Check that the backend service is running and its URL is configured.`)
+        throw new Error(`Cannot reach backend at ${base}. Check that the ngrok tunnel is online.`)
     }
     const body = await response.text()
     let data: any
@@ -83,6 +93,7 @@ export const api = {
             })
         }),
     url: apiBase,
+    backendHost,
 }
 export const qs = queryString
 export const rowsOf = (data: any): Row[] => Array.isArray(data) ? data : data?.items || data?.results || data?.models || data?.datasets || []

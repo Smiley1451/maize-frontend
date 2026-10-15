@@ -1,6 +1,26 @@
 {
   "rewrites": [
     {
+      "source": "/api/v1/:path*",
+      "destination": "https://preposterous-luetta-nonspecifically.ngrok-free.dev/api/v1/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://preposterous-luetta-nonspecifically.ngrok-free.dev/health"
+    },
+    {
+      "source": "/ready",
+      "destination": "https://preposterous-luetta-nonspecifically.ngrok-free.dev/ready"
+    },
+    {
+      "source": "/docs",
+      "destination": "https://preposterous-luetta-nonspecifically.ngrok-free.dev/docs"
+    },
+    {
+      "source": "/openapi.json",
+      "destination": "https://preposterous-luetta-nonspecifically.ngrok-free.dev/openapi.json"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

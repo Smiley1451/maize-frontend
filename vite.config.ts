@@ -29,27 +29,27 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api/v1': {
-        target: process.env.VITE_BACKEND_TARGET || 'http://127.0.0.1:9095',
+        target: process.env.VITE_BACKEND_TARGET || 'https://preposterous-luetta-nonspecifically.ngrok-free.dev',
         changeOrigin: true,
         headers: { 'ngrok-skip-browser-warning': '1' },
       },
       '/health': {
-        target: process.env.VITE_BACKEND_TARGET || 'http://127.0.0.1:9095',
+        target: process.env.VITE_BACKEND_TARGET || 'https://preposterous-luetta-nonspecifically.ngrok-free.dev',
         changeOrigin: true,
         headers: { 'ngrok-skip-browser-warning': '1' },
       },
       '/ready': {
-        target: process.env.VITE_BACKEND_TARGET || 'http://127.0.0.1:9095',
+        target: process.env.VITE_BACKEND_TARGET || 'https://preposterous-luetta-nonspecifically.ngrok-free.dev',
         changeOrigin: true,
         headers: { 'ngrok-skip-browser-warning': '1' },
       },
       '/docs': {
-        target: process.env.VITE_BACKEND_TARGET || 'http://127.0.0.1:9095',
+        target: process.env.VITE_BACKEND_TARGET || 'https://preposterous-luetta-nonspecifically.ngrok-free.dev',
         changeOrigin: true,
         headers: { 'ngrok-skip-browser-warning': '1' },
       },
       '/openapi.json': {
-        target: process.env.VITE_BACKEND_TARGET || 'http://127.0.0.1:9095',
+        target: process.env.VITE_BACKEND_TARGET || 'https://preposterous-luetta-nonspecifically.ngrok-free.dev',
         changeOrigin: true,
         headers: { 'ngrok-skip-browser-warning': '1' },
       },

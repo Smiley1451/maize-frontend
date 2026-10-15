@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Check, Copy, FileText, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react'
+import { Check, Copy, FileText, ExternalLink, ChevronDown, ChevronUp, Table, Maximize2, Minimize2 } from 'lucide-react'
 import type { SourceDetail } from './api'
 
 interface MarkdownViewProps {
@@ -150,6 +150,117 @@ export function CodeBlock({ language, code }: { language: string; code: string }
 }
 
 /**
+ * Fully Scrollable & Expandable Markdown Table Component
+ * Ensures multi-column research tables don't truncate or squish row contents.
+ */
+export function MarkdownTable({
+  headers,
+  alignments,
+  rows,
+  onCitationClick,
+}: {
+  headers: string[]
+  alignments: string[]
+  rows: string[][]
+  onCitationClick?: (citationId: string) => void
+}) {
+  const [copied, setCopied] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+
+  const handleCopyCsv = async () => {
+    try {
+      const csv = [
+        headers.map(h => `"${h.replace(/"/g, '""')}"`).join(','),
+        ...rows.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(',')),
+      ].join('\n')
+      await navigator.clipboard.writeText(csv)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  return (
+    <div className={`markdown-table-container ${expanded ? 'table-container-expanded' : ''}`}>
+      <div className="table-toolbar">
+        <div className="table-meta-tag">
+          <Table size={13} className="text-brand" />
+          <span>
+            <b>Structured Table</b> ({headers.length} columns × {rows.length} rows)
+          </span>
+          <span className="table-scroll-hint">↔ Scroll horizontally for full row data</span>
+        </div>
+        <div className="table-actions">
+          <button
+            type="button"
+            className="table-tool-btn"
+            onClick={() => setExpanded(!expanded)}
+            title={expanded ? 'Collapse to standard width' : 'Expand to full width'}
+          >
+            {expanded ? <Minimize2 size={11} /> : <Maximize2 size={11} />}
+            <span>{expanded ? 'Collapse' : 'Expand full width'}</span>
+          </button>
+          <button
+            type="button"
+            className="table-tool-btn"
+            onClick={handleCopyCsv}
+            title="Copy as CSV"
+          >
+            {copied ? (
+              <>
+                <Check size={11} className="copy-success" />
+                <span>Copied CSV!</span>
+              </>
+            ) : (
+              <>
+                <Copy size={11} />
+                <span>Copy CSV</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      <div className="markdown-table-wrapper">
+        <table className="markdown-table">
+          <thead>
+            <tr>
+              {headers.map((h, colIdx) => (
+                <th
+                  key={colIdx}
+                  style={{ textAlign: (alignments[colIdx] || 'left') as any }}
+                >
+                  {renderInline(h, onCitationClick)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, rowIdx) => (
+              <tr key={rowIdx}>
+                {headers.map((_, colIdx) => {
+                  const cellVal = row[colIdx] ?? ''
+                  return (
+                    <td
+                      key={colIdx}
+                      style={{ textAlign: (alignments[colIdx] || 'left') as any }}
+                    >
+                      {renderInline(cellVal, onCitationClick)}
+                    </td>
+                  )
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+/**
  * Parse and render complete Markdown document into structured React nodes
  */
 export function MarkdownView({ content, onCitationClick }: MarkdownViewProps) {
@@ -224,39 +335,13 @@ export function MarkdownView({ content, onCitationClick }: MarkdownViewProps) {
       }
 
       elements.push(
-        <div className="markdown-table-wrapper" key={`table-${elements.length}`}>
-          <table className="markdown-table">
-            <thead>
-              <tr>
-                {headers.map((h, colIdx) => (
-                  <th
-                    key={colIdx}
-                    style={{ textAlign: (alignments[colIdx] || 'left') as any }}
-                  >
-                    {renderInline(h, onCitationClick)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {dataRows.map((row, rowIdx) => (
-                <tr key={rowIdx}>
-                  {headers.map((_, colIdx) => {
-                    const cellVal = row[colIdx] ?? ''
-                    return (
-                      <td
-                        key={colIdx}
-                        style={{ textAlign: (alignments[colIdx] || 'left') as any }}
-                      >
-                        {renderInline(cellVal, onCitationClick)}
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <MarkdownTable
+          key={`table-${elements.length}`}
+          headers={headers}
+          alignments={alignments}
+          rows={dataRows}
+          onCitationClick={onCitationClick}
+        />
       )
       continue
     }

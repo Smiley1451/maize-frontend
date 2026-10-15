@@ -751,7 +751,7 @@ function Assistant() {
                         onCitationClick={handleCitationClick}
                       />
                     ) : (
-                      m.text
+                      <span style={{ whiteSpace: 'pre-wrap' }}>{m.text}</span>
                     )}
                   </div>
 
